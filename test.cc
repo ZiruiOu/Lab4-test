@@ -187,6 +187,29 @@ static int SendAging(int fd) {
   }
 }
 
+static int RecvAging(int fd) {
+  char buf[128];
+  int ret = recv(fd, buf);
+  if (ret != -1) sscanf(buf, "%d\n", &ret);
+  return ret;
+}
+
+static int SendWarmup(int fd) {
+  char msgBuf[256];
+  int len = sprintf(msgBuf, "warmup\n");
+  msgBuf[len] = 0;
+  if (send(fd, msgBuf, len)) {
+    std::cerr << "GTest: Aging failed to send to simulator" << std::endl;
+  }
+}
+
+static int RecvWarmup(int fd) {
+  char buf[128];
+  int ret = recv(fd, buf);
+  if (ret != -1) sscanf(buf, "%d\n", &ret);
+  return ret;
+}
+
 static void SendExit(int fd) {
   if (send(fd, "exit\n", 5) == -1) {
     std::cerr << "GTest: failed to send to simulator" << std::endl;
@@ -251,16 +274,22 @@ TEST_F(Topology1, Forwarding) {
   }
 
   // Warmup the MAC Table of each switch.
-  for (int i = 0; i < kNumHost; i++) {
-    for (int j = 0; j < kNumHost; j++) {
-      char msgBuf[256] = {};
-      if (i == j) {
-        continue;
-      }
-      sprintf(msgBuf, "HelloFrom%dTo%d", i, j);
-      send_hostbroadcast(writeFd, hostEtherAddrs[i], hostEtherAddrs[j], msgBuf);
-      SendNS(writeFd);
-    }
+  //  for (int i = 0; i < kNumHost; i++) {
+  //    for (int j = 0; j < kNumHost; j++) {
+  //      char msgBuf[256] = {};
+  //      if (i == j) {
+  //        continue;
+  //      }
+  //      sprintf(msgBuf, "HelloFrom%dTo%d", i, j);
+  //      send_hostbroadcast(writeFd, hostEtherAddrs[i], hostEtherAddrs[j],
+  //      msgBuf); SendNS(writeFd);
+  //    }
+  //  }
+  SendWarmup(writeFd);
+  ret = RecvWarmup(readFd);
+  if (ret == -1) {
+    std::cerr << "GTest : Warmup forwarding table fails" << std::endl;
+    return;
   }
 
   int len = 0;
@@ -346,7 +375,7 @@ TEST_F(Topology1, SwitchAging) {
   // Send Aging message to controller.
   for (int i = 0; i < 15; i++) {
     SendAging(writeFd);
-    SendNS(writeFd);
+    RecvAging(readFd);
   }
 
   // Start aging test : now 0 -> 1 && 1 -> 2 should fail with broadcast error.
@@ -388,15 +417,20 @@ TEST_F(Topology2, Forwarding) {
   }
 
   // Warmup the MAC Table of each switch.
-  for (int i = 0; i < kNumHost; i++) {
-    for (int j = 0; j < kNumHost; j++) {
-      if (i != j) {
-        char msgBuf[256];
-        sprintf(msgBuf, "HelloFromHost%dtoHost%d.", i, j);
-        send_hostbroadcast(writeFd, hostAddress[i], hostAddress[j], msgBuf);
-        SendNS(writeFd);
-      }
-    }
+  //  for (int i = 0; i < kNumHost; i++) {
+  //    for (int j = 0; j < kNumHost; j++) {
+  //      if (i != j) {
+  //        char msgBuf[256];
+  //        sprintf(msgBuf, "HelloFromHost%dtoHost%d.", i, j);
+  //        send_hostbroadcast(writeFd, hostAddress[i], hostAddress[j], msgBuf);
+  //        SendNS(writeFd);
+  //      }
+  //    }
+  //  }
+  SendWarmup(writeFd);
+  if (-1 == RecvWarmup(readFd)) {
+    std::cerr << "GTest : Warmup forwarding table fails" << std::endl;
+    return;
   }
 
   // Start forwarding test.
@@ -493,7 +527,7 @@ TEST_F(Topology2, SwitchAging) {
   // Send Aging to controller.
   for (int i = 0; i < 15; i++) {
     SendAging(writeFd);
-    SendNS(writeFd);
+    RecvAging(readFd);
   }
 
   // Start aging testing.
@@ -545,15 +579,21 @@ TEST_F(Topology3, Forwarding) {
   }
 
   // Warmup MAC Table.
-  for (int i = 0; i < kNumHost; i++) {
-    for (int j = 0; j < kNumHost; j++) {
-      if (i != j) {
-        char msgBuf[256] = {};
-        sprintf(msgBuf, "From%dTo%d", i, j);
-        send_hostbroadcast(writeFd, hostAddrs[i], hostAddrs[j], msgBuf);
-        SendNS(writeFd);
-      }
-    }
+  //  for (int i = 0; i < kNumHost; i++) {
+  //    for (int j = 0; j < kNumHost; j++) {
+  //      if (i != j) {
+  //        char msgBuf[256] = {};
+  //        sprintf(msgBuf, "From%dTo%d", i, j);
+  //        send_hostbroadcast(writeFd, hostAddrs[i], hostAddrs[j], msgBuf);
+  //        SendNS(writeFd);
+  //      }
+  //    }
+  //  }
+
+  SendWarmup(writeFd);
+  if (-1 == RecvWarmup(readFd)) {
+    std::cerr << "GTest : Warmup forwarding table fails" << std::endl;
+    return;
   }
 
   int kDistance[kNumHost][kNumHost] = {{0, 1, 2, 2, 3, 3}, {1, 0, 2, 2, 3, 3},
@@ -663,7 +703,7 @@ TEST_F(Topology3, SwitchAging) {
   // Send Aging th controller.
   for (int i = 0; i < 15; i++) {
     SendAging(writeFd);
-    SendNS(writeFd);
+    RecvAging(readFd);
   }
 
   // Now the MAC Table should be cleared.
@@ -818,7 +858,7 @@ TEST_F(Topology4, Mixing) {
   // Send Aging message to controller.
   for (int i = 0; i < 7; i++) {
     SendAging(writeFd);
-    SendNS(writeFd);
+    RecvAging(readFd);
   }
 
   // generatng random pair
@@ -835,7 +875,7 @@ TEST_F(Topology4, Mixing) {
 
   for (int i = 0; i < 7; i++) {
     SendAging(writeFd);
-    SendNS(writeFd);
+    RecvAging(readFd);
   }
 
   // This src -> dest should not be flushed.
