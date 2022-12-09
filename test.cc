@@ -16,10 +16,6 @@
 #include <string>
 #include <thread>
 
-#include "common.h"
-#include "types.h"
-#include "utils.h"
-
 pid_t StartController(int &read_fd, int &write_fd) {
   int read_fds[2], write_fds[2];
   if (pipe(read_fds) != 0) {
