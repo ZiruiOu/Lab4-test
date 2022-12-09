@@ -178,7 +178,6 @@ static int RecvHostsend(int fd, int &len, char *src, char *payload) {
 }
 
 static int SendAging(int fd) {
-  usleep(100000);
   char msgBuf[256];
   int len = sprintf(msgBuf, "aging\n");
   msgBuf[len] = 0;
