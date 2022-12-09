@@ -342,18 +342,20 @@ TEST_F(Topology1, SwitchAging) {
   char msgBuf[256], resultBuf[256];
 
   // Warmup the MAC Table of each switch.
-  for (int i = 0; i < kNumHost; i++) {
-    for (int j = 0; j < kNumHost; j++) {
-      if (i == j) {
-        continue;
-      }
-
-      bzero(msgBuf, sizeof(msgBuf));
-      sprintf(msgBuf, "HelloFrom%dTo%d", i, j);
-      send_hostbroadcast(writeFd, hostEtherAddrs[i], hostEtherAddrs[j], msgBuf);
-      SendNS(writeFd);
-    }
-  }
+  //  for (int i = 0; i < kNumHost; i++) {
+  //    for (int j = 0; j < kNumHost; j++) {
+  //      if (i == j) {
+  //        continue;
+  //      }
+  //
+  //      bzero(msgBuf, sizeof(msgBuf));
+  //      sprintf(msgBuf, "HelloFrom%dTo%d", i, j);
+  //      send_hostbroadcast(writeFd, hostEtherAddrs[i], hostEtherAddrs[j],
+  //      msgBuf); SendNS(writeFd);
+  //    }
+  //  }
+  SendWarmup(writeFd);
+  EXPECT_NE(RecvWarmup(readFd), -1);
 
   bzero(msgBuf, sizeof(msgBuf));
   sprintf(msgBuf, "HelloFromTopology1AgingTest");
@@ -487,16 +489,18 @@ TEST_F(Topology2, SwitchAging) {
   }
 
   // Warmup the MAC Table of each switch.
-  for (int i = 0; i < kNumHost; i++) {
-    for (int j = 0; j < kNumHost; j++) {
-      if (i != j) {
-        char msgBuf[256] = {};
-        sprintf(msgBuf, "HelloFromHost%dtoHost%d.", i, j);
-        send_hostbroadcast(writeFd, hostAddress[i], hostAddress[j], msgBuf);
-        SendNS(writeFd);
-      }
-    }
-  }
+  //  for (int i = 0; i < kNumHost; i++) {
+  //    for (int j = 0; j < kNumHost; j++) {
+  //      if (i != j) {
+  //        char msgBuf[256] = {};
+  //        sprintf(msgBuf, "HelloFromHost%dtoHost%d.", i, j);
+  //        send_hostbroadcast(writeFd, hostAddress[i], hostAddress[j], msgBuf);
+  //        SendNS(writeFd);
+  //      }
+  //    }
+  //  }
+  SendWarmup(writeFd);
+  EXPECT_NE(RecvWarmup(readFd), -1);
 
   int len;
   char srcAddress[32];
@@ -658,16 +662,18 @@ TEST_F(Topology3, SwitchAging) {
   }
 
   // Warmup MAC Table.
-  for (int i = 0; i < kNumHost; i++) {
-    for (int j = 0; j < kNumHost; j++) {
-      if (i != j) {
-        char msgBuf[256] = {};
-        sprintf(msgBuf, "From%dTo%d", i, j);
-        send_hostbroadcast(writeFd, hostAddrs[i], hostAddrs[j], msgBuf);
-        SendNS(writeFd);
-      }
-    }
-  }
+  //  for (int i = 0; i < kNumHost; i++) {
+  //    for (int j = 0; j < kNumHost; j++) {
+  //      if (i != j) {
+  //        char msgBuf[256] = {};
+  //        sprintf(msgBuf, "From%dTo%d", i, j);
+  //        send_hostbroadcast(writeFd, hostAddrs[i], hostAddrs[j], msgBuf);
+  //        SendNS(writeFd);
+  //      }
+  //    }
+  //  }
+  SendWarmup(writeFd);
+  EXPECT_NE(RecvWarmup(readFd), -1);
 
   // Start Forwarding test.
   int len;
@@ -746,17 +752,19 @@ TEST_F(Topology4, Forwarding) {
   }
 
   // Warmup the MAC Table of each switch.
-  for (int i = 0; i < kNumHost; i++) {
-    for (int j = 0; j < kNumHost; j++) {
-      char msgBuf[256] = {};
-      if (i == j) {
-        continue;
-      }
-      sprintf(msgBuf, "HelloFrom%dTo%d", i, j);
-      send_hostbroadcast(writeFd, hostEtherAddrs[i], hostEtherAddrs[j], msgBuf);
-      SendNS(writeFd);
-    }
-  }
+  //  for (int i = 0; i < kNumHost; i++) {
+  //    for (int j = 0; j < kNumHost; j++) {
+  //      char msgBuf[256] = {};
+  //      if (i == j) {
+  //        continue;
+  //      }
+  //      sprintf(msgBuf, "HelloFrom%dTo%d", i, j);
+  //      send_hostbroadcast(writeFd, hostEtherAddrs[i], hostEtherAddrs[j],
+  //      msgBuf); SendNS(writeFd);
+  //    }
+  //  }
+  SendWarmup(writeFd);
+  EXPECT_NE(RecvWarmup(readFd), -1);
 
   int len = 0;
   char srcAddr[20];
@@ -820,18 +828,20 @@ TEST_F(Topology4, Mixing) {
   char msgBuf[256], resultBuf[256];
 
   // Warmup the MAC Table of each switch.
-  for (int i = 0; i < kNumHost; i++) {
-    for (int j = 0; j < kNumHost; j++) {
-      char msgBuf[256] = {};
-      if (i == j) {
-        continue;
-      }
-      bzero(msgBuf, sizeof(msgBuf));
-      sprintf(msgBuf, "HelloFrom%dTo%d", i, j);
-      send_hostbroadcast(writeFd, hostEtherAddrs[i], hostEtherAddrs[j], msgBuf);
-      SendNS(writeFd);
-    }
-  }
+  //  for (int i = 0; i < kNumHost; i++) {
+  //    for (int j = 0; j < kNumHost; j++) {
+  //      char msgBuf[256] = {};
+  //      if (i == j) {
+  //        continue;
+  //      }
+  //      bzero(msgBuf, sizeof(msgBuf));
+  //      sprintf(msgBuf, "HelloFrom%dTo%d", i, j);
+  //      send_hostbroadcast(writeFd, hostEtherAddrs[i], hostEtherAddrs[j],
+  //      msgBuf); SendNS(writeFd);
+  //    }
+  //  }
+  SendWarmup(writeFd);
+  EXPECT_NE(RecvWarmup(readFd), -1);
 
   bzero(msgBuf, sizeof(msgBuf));
   sprintf(msgBuf, "HelloFromTopology4MixingTest");
