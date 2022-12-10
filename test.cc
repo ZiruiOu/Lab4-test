@@ -181,7 +181,7 @@ static int SendAging(int fd) {
   char msgBuf[256];
   int len = sprintf(msgBuf, "aging\n");
   msgBuf[len] = 0;
-  if (send(fd, msgBuf, len)) {
+  if (send(fd, msgBuf, len) == -1) {
     std::cerr << "GTest: Aging failed to send to simulator" << std::endl;
   }
 }
@@ -197,7 +197,7 @@ static int SendWarmup(int fd) {
   char msgBuf[256];
   int len = sprintf(msgBuf, "warmup\n");
   msgBuf[len] = 0;
-  if (send(fd, msgBuf, len)) {
+  if (send(fd, msgBuf, len) == -1) {
     std::cerr << "GTest: Aging failed to send to simulator" << std::endl;
   }
 }
